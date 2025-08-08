@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\guts\\Desktop\\blogsite\\",
+  "WorkspaceRootPath": "C:\\Users\\guts\\Desktop\\bs\\L4M\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\guts\\desktop\\blogsite\\blogsite\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\guts\\desktop\\bs\\l4m\\blogsite\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\guts\\Desktop\\blogsite\\blogsite\\Views\\Home\\Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "blogsite\\Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Users\\guts\\Desktop\\blogsite\\blogsite\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\Views\\Home\\Index.cshtml",
               "RelativeToolTip": "blogsite\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAAFUAAAAAAAAAAAAqwG4AAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAswLQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-07-28T00:20:48.612Z",
               "IsPinned": true,

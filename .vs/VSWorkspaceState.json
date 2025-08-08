@@ -2,9 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\blogsite",
+    "\\blogsite\\Views",
+    "\\blogsite\\Views\\Home",
     "\\blogsite\\wwwroot",
     "\\blogsite\\wwwroot\\js"
   ],
-  "SelectedNode": "\\blogsite.sln",
+  "SelectedNode": "\\blogsite\\Views\\Home\\Index.cshtml",
   "PreviewInSolutionExplorer": false
 }
