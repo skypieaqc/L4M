@@ -251,7 +251,32 @@
                 el.className = 'hex-panel';
                 const inner = document.createElement('div');
                 inner.className = 'hex-panel-inner';
-                inner.textContent = String(id);
+                if (id === 1) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.padding = '20px';
+                    wrapper.style.textAlign = 'left';
+                    wrapper.style.fontSize = '16px';
+                    wrapper.style.fontWeight = 'normal';
+                    wrapper.style.color = '#111';
+
+                    const title = document.createElement('h3');
+                    title.textContent = 'Ben Kimim?';
+                    title.style.margin = '0 0 10px 0';
+                    title.style.fontSize = '20px';
+                    title.style.borderBottom = '1px solid #e5e5e5';
+                    title.style.paddingBottom = '8px';
+
+                    const p = document.createElement('p');
+                    p.textContent = 'Merhaba, ben [Adınız]. Full-stack geliştirme ve 3D web deneyimleri üzerine çalışıyorum. Bu sitede projelerimi, deneyimlerimi ve notlarımı paylaşıyorum.';
+                    p.style.margin = '10px 0 0 0';
+                    p.style.lineHeight = '1.5';
+
+                    wrapper.appendChild(title);
+                    wrapper.appendChild(p);
+                    inner.appendChild(wrapper);
+                } else {
+                    inner.textContent = String(id);
+                }
                 el.appendChild(inner);
                 el.dataset.id = String(id);
                 hexScene.appendChild(el);
