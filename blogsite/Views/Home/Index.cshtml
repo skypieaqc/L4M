@@ -235,6 +235,7 @@
 
             const panels = [1, 2, 3, 4, 5, 6];
             const panelElements = [];
+            const panelRotations = new Array(panels.length).fill(null); // mevcut rotateY takip
 
             panels.forEach(id => {
                 const el = document.createElement('div');
@@ -268,7 +269,8 @@
                 const samplePanel = panelElements[0];
                 const panelHalfHeight = samplePanel ? samplePanel.offsetHeight / 2 : 200;
                 const baseBottomMargin = 20;
-                const yFrontBase = Math.max(0, (sceneHeight / 2) - panelHalfHeight - baseBottomMargin);
+                const uplift = 150; // tüm grubu biraz yukarı taşı
+                const yFrontBase = (sceneHeight / 2) - panelHalfHeight - baseBottomMargin - uplift;
                 const stepY = 120; // her katman yukarı
 
                 panelElements.forEach((panel, index) => {
@@ -283,11 +285,20 @@
                     let layer; // 0: ön, 1: ±60, 2: ±120, 3: 180
                     if (absA < 30) layer = 0; else if (absA < 90) layer = 1; else if (absA < 150) layer = 2; else layer = 3;
 
-                    const opacity = Math.max(0, 1 - 0.2 * layer); // 1.0, 0.8, 0.6, 0.4
+                    const opacity = (layer === 3) ? 0 : Math.max(0, 1 - 0.2 * layer); // 1.0, 0.8, 0.6, 0.0
                     const scale = 1 - 0.1 * layer; // 1.0, 0.9, 0.8, 0.7
                     const y = yFrontBase - (stepY * layer);
 
-                    panel.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${panelAngleNorm}deg) scale(${scale})`;
+                    // Dönüşü en kısa yoldan yap: önceki değere en yakın eşdeğer hedefi seç
+                    const prev = panelRotations[index];
+                    let target = panelAngleNorm;
+                    if (prev !== null) {
+                        while (target - prev > 180) target -= 360;
+                        while (target - prev < -180) target += 360;
+                    }
+                    panelRotations[index] = target;
+
+                    panel.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${target}deg) scale(${scale})`;
                     panel.style.opacity = opacity;
 
                     const inner = panel.querySelector('.hex-panel-inner');
