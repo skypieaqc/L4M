@@ -168,7 +168,7 @@
             scene3d.background = new THREE.Color(0x222222);
 
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
+            camera.position.z = 2.5;
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -181,16 +181,25 @@
             scene3d.add(directionalLight);
 
             const loader = new THREE.GLTFLoader();
+            function frameObject(camera, object, offset = 1.2) {
+                const box = new THREE.Box3().setFromObject(object);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+                const maxSize = Math.max(size.x, size.y, size.z);
+                const fitHeightDistance = maxSize / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
+                const fitWidthDistance = fitHeightDistance / camera.aspect;
+                const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
+                camera.position.set(center.x, center.y, center.z + distance);
+                camera.near = distance / 100;
+                camera.far = distance * 100;
+                camera.updateProjectionMatrix();
+                camera.lookAt(center);
+            }
             loader.load(
                 '/models/guts.glb',
                 function (gltf) {
                     const model = gltf.scene;
-                    const box = new THREE.Box3().setFromObject(model);
-                    const center = box.getCenter(new THREE.Vector3());
-                    const size = box.getSize(new THREE.Vector3());
-
-                    model.position.sub(center);
-                    camera.position.z = Math.max(size.x, size.y, size.z) * 2;
+                    frameObject(camera, model, 1.05); // modele yakın başlat
 
                     scene3d.add(model);
                     loadingOverlay.style.opacity = '0';
