@@ -136,6 +136,15 @@
 
             function updatePanelPositions(angle) {
                 const radius = 600; // Yarıçap
+                const sceneHeight = scene.clientHeight;
+
+                // Panel ölçüleri ve alt hizalama için baz Y (alt kenardan 20px yukarıda)
+                // transform referansı merkez olduğu için, alt hizalama: merkezden aşağı doğru ofset
+                const samplePanel = panelElements[0];
+                const panelHalfHeight = samplePanel ? samplePanel.offsetHeight / 2 : 200; // default 400/2
+                const baseBottomMargin = 20;
+                const yFrontBase = Math.max(0, (sceneHeight / 2) - panelHalfHeight - baseBottomMargin);
+                const stepY = 120; // her arka katman için yükseklik artışı
 
                 panelElements.forEach((panel, index) => {
                     const rawAngle = angle + index * 60; // ham açı
@@ -146,22 +155,23 @@
                     const x = Math.sin(rad) * radius;
                     const z = Math.cos(rad) * radius;
 
-                    // Opaklık ve ölçeklendirme
+                    // Katman belirleme ve opaklık/ölçek
                     const absA = Math.abs(panelAngleNorm);
-                    let opacity, scale;
-                    if (absA < 30) { // 0° yakın: ön panel
-                        opacity = 1.0; scale = 1.0;
-                    } else if (absA >= 30 && absA < 90) { // ±60° yakın: yan paneller
-                        opacity = 0.85; scale = 0.85;
-                    } else if (absA >= 90 && absA < 150) { // ±120° yakın
-                        opacity = 0.55; scale = 0.75;
-                    } else { // ~180°: arka panel
-                        opacity = 0.0; scale = 0.65;
-                    }
+                    let layer; // 0: ön, 1: ±60, 2: ±120, 3: 180
+                    if (absA < 30) layer = 0;
+                    else if (absA < 90) layer = 1;
+                    else if (absA < 150) layer = 2;
+                    else layer = 3;
+
+                    const opacity = Math.max(0, 1 - 0.2 * layer); // 1.0, 0.8, 0.6, 0.4
+                    const scale = 1 - 0.1 * layer; // 1.0, 0.9, 0.8, 0.7
+
+                    // Dikey ofset: ön en aşağıda, sonra her katmanda biraz daha yukarı
+                    const y = yFrontBase - (stepY * layer);
 
                     // Transform uygula: konumlandır + Y ekseninde konuma göre döndür + ölçek
                     panel.style.transform = `
-                        translate3d(${x}px, 0, ${z}px)
+                        translate3d(${x}px, ${y}px, ${z}px)
                         rotateY(${panelAngleNorm}deg)
                         scale(${scale})
                     `;
