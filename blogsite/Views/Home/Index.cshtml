@@ -188,7 +188,7 @@
             const scene3d = new THREE.Scene();
             scene3d.background = new THREE.Color(0x222222);
 
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight , 0.1, 1000);
             camera.position.z = 2.5;
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -203,28 +203,49 @@
 
             const loader = new THREE.GLTFLoader();
             function frameObject(camera, object, offset = 1.2) {
-                const box = new THREE.Box3().setFromObject(object);
-                const size = box.getSize(new THREE.Vector3());
-                const center = box.getCenter(new THREE.Vector3());
-                const maxSize = Math.max(size.x, size.y, size.z);
-                const fitHeightDistance = maxSize / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
-                const fitWidthDistance = fitHeightDistance / camera.aspect;
-                const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
-                camera.position.set(center.x, center.y, center.z + distance);
-                camera.near = distance / 100;
-                camera.far = distance * 100;
-                camera.updateProjectionMatrix();
-                camera.lookAt(center);
+              const box = new THREE.Box3().setFromObject(object);
+              const size = box.getSize(new THREE.Vector3());
+              const center = box.getCenter(new THREE.Vector3());
+              const maxSize = Math.max(size.x, size.y, size.z);
+              const fitHeightDistance = maxSize / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
+              const fitWidthDistance = fitHeightDistance / camera.aspect;
+              const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
+
+              const yDown = 0 * maxSize;            // 0.10–0.30 arası deneyebilirsiniz
+              camera.position.set(center.x, center.y - yDown, center.z + distance);
+
+              camera.near = distance / 100;
+              camera.far = distance * 100;
+              camera.updateProjectionMatrix();
+              camera.lookAt(center);
+
+              //camera.position.y += 0.15; // 0.05–0.2 arasında deneyin
+              //controls.update();
             }
+    
+           
+
             loader.load(
                 '/models/guts.glb',
                 function (gltf) {
-                    const model = gltf.scene;
-                    frameObject(camera, model, 1.05); // modele yakın başlat
+                  const model = gltf.scene;
 
-                    scene3d.add(model);
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+                  // 1) Nihai transformlar önce
+                  model.scale.set(0.63, 0.63, 0.63);
+                  model.position.y = -0.8;
+                  scene3d.add(model);
+
+                  // 2) İlk kadrajı istediğin uzaklıkta yap (2–3 scroll eşleniği için 1.35 civarı)
+                  frameObject(camera, model, );
+
+                  // 3) OrbitControls hedefini modele sabitle
+                  const box = new THREE.Box3().setFromObject(model);
+                  const center = box.getCenter(new THREE.Vector3());
+                  controls.target.copy(center);
+                  controls.update();
+
+                  loadingOverlay.style.opacity = '0';
+                  setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
                 },
                 function (xhr) {
                     if (xhr.total) progressBar.value = (xhr.loaded / xhr.total) * 100;
