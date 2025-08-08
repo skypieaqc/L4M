@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>3D Hexagonal Panel Sistemi</title>
@@ -42,6 +42,10 @@
             top: 50%;
             margin-left: -150px;
             margin-top: -200px;
+            /* Hexagon görünümü için */
+            clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%);
+            border: 4px solid rgba(255,255,255,0.6);
+            background-image: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(240,240,240,0.9));
         }
 
         .nav-arrow {
@@ -125,37 +129,48 @@
                 updatePanelPositions(currentAngle);
             }
 
+            function normalizeAngleDeg(deg) {
+                // -180 ile 180 aralığına normalize et
+                let a = ((deg + 180) % 360 + 360) % 360 - 180;
+                return a;
+            }
+
             function updatePanelPositions(angle) {
-                const radius = 800; // Yarıçap
+                const radius = 600; // Yarıçap
 
                 panelElements.forEach((panel, index) => {
-                    const panelAngle = (angle + index * 60) % 360;
-                    const rad = panelAngle * Math.PI / 180;
+                    const rawAngle = angle + index * 60; // ham açı
+                    const panelAngleNorm = normalizeAngleDeg(rawAngle); // -180..180
+                    const rad = (rawAngle % 360) * Math.PI / 180;
 
-                    // 3D pozisyonları hesapla
+                    // 3D pozisyonları hesapla (0° önde, 180° arkada)
                     const x = Math.sin(rad) * radius;
-                    const z = -Math.cos(rad) * radius; // Z ekseni negatif olacak
+                    const z = Math.cos(rad) * radius;
 
                     // Opaklık ve ölçeklendirme
+                    const absA = Math.abs(panelAngleNorm);
                     let opacity, scale;
-
-                    if (panelAngle % 360 === 0) {
-                        opacity = 1.0; scale = 1.0;   // Öndeki panel (1)
-                    } else if (Math.abs(panelAngle % 360 - 60) < 30 || Math.abs(panelAngle % 360 - 300) < 30) {
-                        opacity = 0.8; scale = 0.8;   // Yan paneller (2 ve 6)
-                    } else if (Math.abs(panelAngle % 360 - 120) < 30 || Math.abs(panelAngle % 360 - 240) < 30) {
-                        opacity = 0.4; scale = 0.7;  // Arka yan paneller (3 ve 5)
-                    } else {
-                        opacity = 0.0; scale = 0.6;   // Arkadaki panel (4)
+                    if (absA < 30) { // 0° yakın: ön panel
+                        opacity = 1.0; scale = 1.0;
+                    } else if (absA >= 30 && absA < 90) { // ±60° yakın: yan paneller
+                        opacity = 0.85; scale = 0.85;
+                    } else if (absA >= 90 && absA < 150) { // ±120° yakın
+                        opacity = 0.55; scale = 0.75;
+                    } else { // ~180°: arka panel
+                        opacity = 0.0; scale = 0.65;
                     }
 
-                    // Transform uygula
+                    // Transform uygula: konumlandır + Y ekseninde konuma göre döndür + ölçek
                     panel.style.transform = `
                         translate3d(${x}px, 0, ${z}px)
+                        rotateY(${panelAngleNorm}deg)
                         scale(${scale})
                     `;
+
                     panel.style.opacity = opacity;
-                    panel.style.zIndex = Math.round(100 - Math.abs(panelAngle % 360) / 3.6);
+
+                    // Z sıralama yardımı (perspektif zaten derinliği verir)
+                    panel.style.zIndex = String(Math.round(1000 + z));
                 });
             }
 
@@ -166,6 +181,12 @@
 
             rightArrow.addEventListener('click', () => {
                 rotate(-angleStep);
+            });
+
+            // Klavye okları ile gezinme
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') rotate(angleStep);
+                if (e.key === 'ArrowRight') rotate(-angleStep);
             });
 
             // Pencere boyutu değiştiğinde yenile
