@@ -1,33 +1,75 @@
-﻿<!DOCTYPE html>
+@model IEnumerable<blogsite.Models.Comment>
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    Layout = null;
+}
+
+<!DOCTYPE html>
 <html>
 <head>
-    <title>3D Hexagonal Panel Sistemi</title>
+    <title>@ViewData["Title"]</title>
     <style>
-        body {
+        :root {
+            --content-bg: rgba(255, 255, 255, 0.95);
+            --border-color: rgba(200, 200, 200, 0.3);
+            --shadow-color: rgba(0, 0, 0, 0.15);
+        }
+
+        html, body {
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            height: 100%;
             font-family: Arial, sans-serif;
-            background: #222;
+            overflow: hidden;
+            background: #222; /* fallback, canvas arkası için */
+        }
+
+        /* 3D Model arka plan container */
+        #modelContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
             height: 100vh;
+            z-index: 0;
+        }
+
+        /* Yükleme Ekranı */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
             display: flex;
             justify-content: center;
             align-items: center;
+            color: white;
+            z-index: 2000;
+            transition: opacity 0.5s;
         }
 
-        #scene {
-            position: relative;
+        /* Hex carousel sahnesi (üst katman) */
+        #hexScene {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
             perspective: 2000px;
+            z-index: 100;
+            pointer-events: none; /* OrbitControls çalışabilsin, oklar ayrı aktif */
         }
 
-        .panel {
+        /* 6'lı dönen çerçeveler (dikdörtgen) */
+        .hex-panel {
             position: absolute;
             width: 300px;
             height: 400px;
             background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
+            border-radius: 0;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
@@ -36,14 +78,28 @@
             font-weight: bold;
             color: #333;
             transition: all 0.8s ease;
-            backface-visibility: hidden;
+            backface-visibility: visible;
             transform-origin: center center;
             left: 50%;
             top: 50%;
-            margin-left: -150px;
-            margin-top: -200px;
+            margin-left: -150px; /* 300/2 */
+            margin-top: -200px;  /* 400/2 */
+            border: 2px solid rgba(255,255,255,0.6);
+            background-image: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,238,238,0.95));
+            pointer-events: none; /* çerçeveler tıklamayı engellemesin */
         }
 
+        .hex-panel-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+        }
+
+        /* Geçiş Okları */
         .nav-arrow {
             position: fixed;
             top: 50%;
@@ -51,7 +107,7 @@
             font-size: 3rem;
             color: white;
             cursor: pointer;
-            z-index: 100;
+            z-index: 1100;
             text-shadow: 0 2px 5px rgba(0,0,0,0.5);
             background: rgba(0,0,0,0.3);
             width: 60px;
@@ -62,115 +118,239 @@
             justify-content: center;
             transition: all 0.3s;
             user-select: none;
+            pointer-events: auto; /* oklar tıklanabilir */
         }
 
-            .nav-arrow:hover {
-                background: rgba(0,0,0,0.6);
-                transform: translateY(-50%) scale(1.1);
-            }
+        .nav-arrow:hover { background: rgba(0,0,0,0.6); transform: translateY(-50%) scale(1.1); }
+        #leftArrow { left: 50px; }
+        #rightArrow { right: 50px; }
 
-        #leftArrow {
-            left: 50px;
-        }
-
-        #rightArrow {
-            right: 50px;
+        /* Responsive (isteğe bağlı) */
+        @@media (max-width: 768px) {
+            .hex-panel { width: 240px; height: 320px; margin-left: -120px; margin-top: -160px; font-size: 3.5rem; }
+            #leftArrow { left: 15px; }
+            #rightArrow { right: 15px; }
         }
     </style>
 </head>
 <body>
-    <div id="scene">
-        <!-- Paneller buraya eklenecek -->
+    <!-- 3D Model Container -->
+    <div id="modelContainer"></div>
+
+    <!-- Yükleme Ekranı -->
+    <div id="loadingOverlay">
+        <div style="text-align: center;">
+            <h2>Model Yükleniyor...</h2>
+            <progress id="progressBar" value="0" max="100" style="width:300px; height:20px;"></progress>
+        </div>
     </div>
 
+    <!-- Hex Çerçeve Sahnesi -->
+    <div id="hexScene"></div>
+
+    <!-- Geçiş Okları -->
     <div class="nav-arrow" id="leftArrow">❮</div>
     <div class="nav-arrow" id="rightArrow">❯</div>
 
+    <!-- Three.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const scene = document.getElementById('scene');
+        document.addEventListener('DOMContentLoaded', function () {
+            // ===== Three.js Model Arkaplan =====
+            const container = document.getElementById('modelContainer');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const progressBar = document.getElementById('progressBar');
+
+            const scene3d = new THREE.Scene();
+            scene3d.background = new THREE.Color(0x222222);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 2.5;
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene3d.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene3d.add(directionalLight);
+
+            const loader = new THREE.GLTFLoader();
+            function frameObject(camera, object, offset = 1.2) {
+                const box = new THREE.Box3().setFromObject(object);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+                const maxSize = Math.max(size.x, size.y, size.z);
+                const fitHeightDistance = maxSize / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
+                const fitWidthDistance = fitHeightDistance / camera.aspect;
+                const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
+                camera.position.set(center.x, center.y, center.z + distance);
+                camera.near = distance / 100;
+                camera.far = distance * 100;
+                camera.updateProjectionMatrix();
+                camera.lookAt(center);
+            }
+            loader.load(
+                '/models/guts.glb',
+                function (gltf) {
+                    const model = gltf.scene;
+                    frameObject(camera, model, 1.05); // modele yakın başlat
+
+                    scene3d.add(model);
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+                },
+                function (xhr) {
+                    if (xhr.total) progressBar.value = (xhr.loaded / xhr.total) * 100;
+                },
+                function (error) {
+                    console.error('Model yükleme hatası:', error);
+                    loadingOverlay.innerHTML = `<div style="text-align:center;padding:20px;">
+                            <h2>Model Yüklenemedi!</h2>
+                            <p>${error.message || 'Bilinmeyen hata'}</p>
+                            <button onclick="window.location.reload()" style="padding:10px 20px;background:#fff;color:#000;border:none;cursor:pointer;">Yeniden Dene</button>
+                        </div>`;
+                }
+            );
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene3d, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', function () {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                // Hex sahnesini de yeniden konumlandır
+                updatePanelPositions(currentAngle);
+            });
+
+            // ===== 6'lı Hex Carousel (dikdörtgen) =====
+            const hexScene = document.getElementById('hexScene');
             const leftArrow = document.getElementById('leftArrow');
             const rightArrow = document.getElementById('rightArrow');
 
-            // Panel verileri
-            const panels = [
-                { id: 1, content: '1' },
-                { id: 2, content: '2' },
-                { id: 3, content: '3' },
-                { id: 4, content: '4' },
-                { id: 5, content: '5' },
-                { id: 6, content: '6' }
-            ];
-
-            // Panel elemanlarını oluştur
+            const panels = [1, 2, 3, 4, 5, 6];
             const panelElements = [];
-            panels.forEach(panel => {
+            const panelRotations = new Array(panels.length).fill(null); // mevcut rotateY takip
+
+            panels.forEach(id => {
                 const el = document.createElement('div');
-                el.className = 'panel';
-                el.textContent = panel.content;
-                el.dataset.id = panel.id;
-                scene.appendChild(el);
+                el.className = 'hex-panel';
+                const inner = document.createElement('div');
+                inner.className = 'hex-panel-inner';
+                if (id === 1) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.padding = '20px';
+                    wrapper.style.textAlign = 'left';
+                    wrapper.style.fontSize = '16px';
+                    wrapper.style.fontWeight = 'normal';
+                    wrapper.style.color = '#111';
+
+                    const title = document.createElement('h3');
+                    title.textContent = 'Ben Kimim?';
+                    title.style.margin = '0 0 10px 0';
+                    title.style.fontSize = '20px';
+                    title.style.borderBottom = '1px solid #e5e5e5';
+                    title.style.paddingBottom = '8px';
+
+                    const p = document.createElement('p');
+                    p.textContent = 'Merhaba, ben [Adınız]. Full-stack geliştirme ve 3D web deneyimleri üzerine çalışıyorum. Bu sitede projelerimi, deneyimlerimi ve notlarımı paylaşıyorum.';
+                    p.style.margin = '10px 0 0 0';
+                    p.style.lineHeight = '1.5';
+
+                    wrapper.appendChild(title);
+                    wrapper.appendChild(p);
+                    inner.appendChild(wrapper);
+                } else {
+                    inner.textContent = String(id);
+                }
+                el.appendChild(inner);
+                el.dataset.id = String(id);
+                hexScene.appendChild(el);
                 panelElements.push(el);
             });
 
-            // Başlangıç pozisyonlarını ayarla
-            updatePanelPositions(0);
-
-            // Dönüş fonksiyonu
             let currentAngle = 0;
-            const angleStep = 60; // 360/6=60 derece
+            const angleStep = 60; // 360/6
 
             function rotate(angle) {
                 currentAngle += angle;
                 updatePanelPositions(currentAngle);
             }
 
+            function normalizeAngleDeg(deg) {
+                let a = ((deg + 180) % 360 + 360) % 360 - 180;
+                return a;
+            }
+
             function updatePanelPositions(angle) {
-                const radius = 800; // Yarıçap
+                const radius = 600;
+                const sceneHeight = hexScene.clientHeight;
+
+                const samplePanel = panelElements[0];
+                const panelHalfHeight = samplePanel ? samplePanel.offsetHeight / 2 : 200;
+                const baseBottomMargin = 20;
+                const uplift = 260; // tüm grubu biraz daha yukarı taşı
+                const yFrontBase = (sceneHeight / 2) - panelHalfHeight - baseBottomMargin - uplift;
+                const stepY = 120; // her katman yukarı
 
                 panelElements.forEach((panel, index) => {
-                    const panelAngle = (angle + index * 60) % 360;
-                    const rad = panelAngle * Math.PI / 180;
+                    const rawAngle = angle + index * 60;
+                    const panelAngleNorm = normalizeAngleDeg(rawAngle);
+                    const rad = (rawAngle % 360) * Math.PI / 180;
 
-                    // 3D pozisyonları hesapla
                     const x = Math.sin(rad) * radius;
-                    const z = -Math.cos(rad) * radius; // Z ekseni negatif olacak
+                    const z = Math.cos(rad) * radius;
 
-                    // Opaklık ve ölçeklendirme
-                    let opacity, scale;
+                    const absA = Math.abs(panelAngleNorm);
+                    let layer; // 0: ön, 1: ±60, 2: ±120, 3: 180
+                    if (absA < 30) layer = 0; else if (absA < 90) layer = 1; else if (absA < 150) layer = 2; else layer = 3;
 
-                    if (panelAngle % 360 === 0) {
-                        opacity = 1.0; scale = 1.0;   // Öndeki panel (1)
-                    } else if (Math.abs(panelAngle % 360 - 60) < 30 || Math.abs(panelAngle % 360 - 300) < 30) {
-                        opacity = 0.8; scale = 0.8;   // Yan paneller (2 ve 6)
-                    } else if (Math.abs(panelAngle % 360 - 120) < 30 || Math.abs(panelAngle % 360 - 240) < 30) {
-                        opacity = 0.4; scale = 0.7;  // Arka yan paneller (3 ve 5)
-                    } else {
-                        opacity = 0.0; scale = 0.6;   // Arkadaki panel (4)
+                    const opacity = (layer === 3) ? 0 : Math.max(0, 1 - 0.2 * layer); // 1.0, 0.8, 0.6, 0.0
+                    const scale = 1 - 0.1 * layer; // 1.0, 0.9, 0.8, 0.7
+                    const y = yFrontBase - (stepY * layer);
+
+                    // Dönüşü en kısa yoldan yap: önceki değere en yakın eşdeğer hedefi seç
+                    const prev = panelRotations[index];
+                    let target = panelAngleNorm;
+                    if (prev !== null) {
+                        while (target - prev > 180) target -= 360;
+                        while (target - prev < -180) target += 360;
                     }
+                    panelRotations[index] = target;
 
-                    // Transform uygula
-                    panel.style.transform = `
-                        translate3d(${x}px, 0, ${z}px)
-                        scale(${scale})
-                    `;
+                    panel.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${target}deg) scale(${scale})`;
                     panel.style.opacity = opacity;
-                    panel.style.zIndex = Math.round(100 - Math.abs(panelAngle % 360) / 3.6);
+
+                    const inner = panel.querySelector('.hex-panel-inner');
+                    if (inner) inner.style.transform = (layer === 3) ? 'rotateY(180deg)' : 'rotateY(0deg)';
+
+                    panel.style.zIndex = String(Math.round(1000 + z));
                 });
             }
 
-            // Oklara tıklama olayları
-            leftArrow.addEventListener('click', () => {
-                rotate(angleStep);
-            });
+            // ilk yerleşim
+            updatePanelPositions(0);
 
-            rightArrow.addEventListener('click', () => {
-                rotate(-angleStep);
-            });
-
-            // Pencere boyutu değiştiğinde yenile
-            window.addEventListener('resize', () => {
-                updatePanelPositions(currentAngle);
+            // Oklara tıklama ve klavye
+            leftArrow.addEventListener('click', () => rotate(angleStep));
+            rightArrow.addEventListener('click', () => rotate(-angleStep));
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') rotate(angleStep);
+                if (e.key === 'ArrowRight') rotate(-angleStep);
             });
         });
     </script>
