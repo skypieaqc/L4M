@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\blogsite.csproj": {}
+    "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\blogsite.csproj": {}
   },
   "projects": {
-    "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\blogsite.csproj": {
+    "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\blogsite.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\blogsite.csproj",
+        "projectUniqueName": "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\blogsite.csproj",
         "projectName": "blogsite",
-        "projectPath": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\blogsite.csproj",
-        "packagesPath": "C:\\Users\\guts\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\obj\\",
+        "projectPath": "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\blogsite.csproj",
+        "packagesPath": "C:\\Users\\ahmet\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\guts\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ahmet\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -43,8 +43,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -80,7 +79,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,10 +1,34 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\guts\\Desktop\\bs\\L4M\\",
+  "WorkspaceRootPath": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\guts\\desktop\\bs\\l4m\\blogsite\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\ahmet\\onedrive\\masa\u00FCst\u00FC\\l4m\\blogsite\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\ahmet\\onedrive\\masa\u00FCst\u00FC\\l4m\\blogsite\\controllers\\commentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\controllers\\commentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\ahmet\\onedrive\\masa\u00FCst\u00FC\\l4m\\blogsite\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\ahmet\\onedrive\\masa\u00FCst\u00FC\\l4m\\blogsite\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\ahmet\\onedrive\\masa\u00FCst\u00FC\\l4m\\blogsite\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\ahmet\\onedrive\\masa\u00FCst\u00FC\\l4m\\blogsite\\models\\comment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\models\\comment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|c:\\users\\ahmet\\onedrive\\masa\u00FCst\u00FC\\l4m\\blogsite\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40E4E505-09AC-4FC3-8FB8-2F86EE7DA91B}|blogsite\\blogsite.csproj|solutionrelative:blogsite\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -20,14 +44,92 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\Views\\Home\\Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "blogsite\\Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Views\\Home\\Index.cshtml",
               "RelativeToolTip": "blogsite\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAAMUAAAAAAAAAAAAAANYAAABTAAAAAAAAAA==",
+              "ViewState": "AQIAABsBAAAAAAAAAAAUwDEBAAAYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-07-28T00:20:48.612Z",
               "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Program.cs",
+              "RelativeDocumentMoniker": "blogsite\\Program.cs",
+              "ToolTip": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Program.cs",
+              "RelativeToolTip": "blogsite\\Program.cs",
+              "ViewState": "AQIAACcAAAAAAAAAAAAAADUAAAAYAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T17:16:26.775Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Privacy.cshtml",
+              "DocumentMoniker": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Views\\Home\\Privacy.cshtml",
+              "RelativeDocumentMoniker": "blogsite\\Views\\Home\\Privacy.cshtml",
+              "ToolTip": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Views\\Home\\Privacy.cshtml",
+              "RelativeToolTip": "blogsite\\Views\\Home\\Privacy.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-08-11T16:54:45.685Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "blogsite\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "blogsite\\Controllers\\HomeController.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T16:54:15.786Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CommentController.cs",
+              "DocumentMoniker": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Controllers\\CommentController.cs",
+              "RelativeDocumentMoniker": "blogsite\\Controllers\\CommentController.cs",
+              "ToolTip": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Controllers\\CommentController.cs",
+              "RelativeToolTip": "blogsite\\Controllers\\CommentController.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAqwCcAAAA0AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T16:42:34.713Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Comment.cs",
+              "DocumentMoniker": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Models\\Comment.cs",
+              "RelativeDocumentMoniker": "blogsite\\Models\\Comment.cs",
+              "ToolTip": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Models\\Comment.cs",
+              "RelativeToolTip": "blogsite\\Models\\Comment.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T16:34:45.81Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "blogsite\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\ahmet\\OneDrive\\Masa\u00FCst\u00FC\\L4M\\blogsite\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "blogsite\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-11T16:34:39.149Z",
               "EditorCaption": ""
             }
           ]

@@ -15,13 +15,10 @@ namespace YourProjectName.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(bool showComments = false)
         {
-            // Veritabanýndan tüm yorumlarý çekiyoruz
-            var comments = _context.Comments.ToList();
-
-            // Boþ liste dönebilir ama kesinlikle null olmaz
-            return View(comments);
+            ViewData["ShowComments"] = showComments;
+            return View();
         }
     }
 }

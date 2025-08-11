@@ -2,6 +2,7 @@
 using blogsite.Data;
 using blogsite.Models;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 namespace blogsite.Controllers
 {
     public class CommentController : Controller
@@ -12,7 +13,6 @@ namespace blogsite.Controllers
         {
             _context = context;
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(Comment comment)
@@ -21,9 +21,25 @@ namespace blogsite.Controllers
             {
                 _context.Comments.Add(comment);
                 await _context.SaveChangesAsync();
+                return Json(new { success = true });
             }
 
-            return RedirectToAction("Index", "Home");
+            return Json(new
+            {
+                success = false,
+                errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetComments()
+        {
+            var comments = await _context.Comments
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+            return Json(comments);
         }
     }
 }

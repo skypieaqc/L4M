@@ -3,6 +3,10 @@
     ViewData["Title"] = "Ana Sayfa";
     Layout = null;
 }
+@{
+    bool showComments = ViewData["ShowComments"] as bool? ?? false;
+}
+@Html.AntiForgeryToken()
 
 <!DOCTYPE html>
 <html>
@@ -13,6 +17,7 @@
             --content-bg: rgba(255, 255, 255, 0.95);
             --border-color: rgba(200, 200, 200, 0.3);
             --shadow-color: rgba(0, 0, 0, 0.15);
+            --transition-duration: 0.8s;
         }
 
         html, body {
@@ -21,7 +26,7 @@
             height: 100%;
             font-family: Arial, sans-serif;
             overflow: hidden;
-            background: #222; /* fallback, canvas arkası için */
+            background: #222;
         }
 
         /* 3D Model arka plan container */
@@ -51,7 +56,7 @@
         }
 
         /* Hex carousel sahnesi (üst katman) */
-        #hexScene {
+        .hex-scene {
             position: fixed;
             top: 0;
             left: 0;
@@ -60,7 +65,16 @@
             transform-style: preserve-3d;
             perspective: 2000px;
             z-index: 100;
-            pointer-events: none; /* OrbitControls çalışabilsin, oklar ayrı aktif */
+            pointer-events: none;
+            transition: transform var(--transition-duration) cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        #hexSceneUpper {
+            transform: translateY(0);
+        }
+
+        #hexSceneLower {
+            transform: translateY(100%);
         }
 
         /* 6'lı dönen çerçeveler (dikdörtgen) */
@@ -77,16 +91,16 @@
             font-size: 5rem;
             font-weight: bold;
             color: #333;
-            transition: all 0.8s ease;
+            transition: all var(--transition-duration) ease;
             backface-visibility: visible;
             transform-origin: center center;
             left: 50%;
             top: 50%;
-            margin-left: -150px; /* 300/2 */
-            margin-top: -200px; /* 400/2 */
+            margin-left: -150px;
+            margin-top: -200px;
             border: 2px solid rgba(255,255,255,0.6);
             background-image: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,238,238,0.95));
-            pointer-events: none; /* çerçeveler tıklamayı engellemesin */
+            pointer-events: auto;
         }
 
         .hex-panel-inner {
@@ -96,7 +110,7 @@
             justify-content: center;
             align-items: center;
             transform-style: preserve-3d;
-            transition: transform 0.8s ease;
+            transition: transform var(--transition-duration) ease;
         }
 
         /* Geçiş Okları */
@@ -118,7 +132,7 @@
             justify-content: center;
             transition: all 0.3s;
             user-select: none;
-            pointer-events: auto; /* oklar tıklanabilir */
+            pointer-events: auto;
         }
 
             .nav-arrow:hover {
@@ -134,7 +148,44 @@
             right: 50px;
         }
 
-        /* Responsive (isteğe bağlı) */
+        /* Scroll okları */
+        .scroll-arrow {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3rem;
+            color: white;
+            cursor: pointer;
+            z-index: 1100;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.3);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            user-select: none;
+            pointer-events: auto;
+            opacity: 0.7;
+        }
+
+            .scroll-arrow:hover {
+                background: rgba(0,0,0,0.6);
+                transform: translateX(-50%) scale(1.1);
+                opacity: 1;
+            }
+
+        #upArrow {
+            top: 20px;
+        }
+
+        #downArrow {
+            bottom: 20px;
+        }
+
+        /* Responsive */
         @@media (max-width: 768px) {
             .hex-panel {
                 width: 240px;
@@ -151,10 +202,17 @@
             #rightArrow {
                 right: 15px;
             }
+
+            .scroll-arrow {
+                width: 50px;
+                height: 50px;
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
 <body>
+    
     <!-- 3D Model Container -->
     <div id="modelContainer"></div>
 
@@ -166,12 +224,19 @@
         </div>
     </div>
 
-    <!-- Hex Çerçeve Sahnesi -->
-    <div id="hexScene"></div>
+    <!-- Hex Çerçeve Sahnesi (Üst Grup) -->
+    <div id="hexSceneUpper" class="hex-scene"></div>
+
+    <!-- Hex Çerçeve Sahnesi (Alt Grup) -->
+    <div id="hexSceneLower" class="hex-scene"></div>
 
     <!-- Geçiş Okları -->
     <div class="nav-arrow" id="leftArrow">❮</div>
     <div class="nav-arrow" id="rightArrow">❯</div>
+
+    <!-- Scroll Okları -->
+    <div class="scroll-arrow" id="upArrow">↑</div>
+    <div class="scroll-arrow" id="downArrow">↓</div>
 
     <!-- Three.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
@@ -179,7 +244,195 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
 
     <script>
+
+        const loadComments = async () => {
+            try {
+                // Yükleme durumunu göster
+                commentsContainer.innerHTML = `
+                            <div style="
+                                color: #777;
+                                text-align: center;
+                                padding: 20px;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                            ">
+                                <div class="spinner" style="
+                                    width: 40px;
+                                    height: 40px;
+                                    border: 4px solid #f3f3f3;
+                                    border-top: 4px solid #3498db;
+                                    border-radius: 50%;
+                                    animation: spin 1s linear infinite;
+                                    margin-bottom: 10px;
+                                "></div>
+                                <div>Yorumlar yükleniyor...</div>
+                            </div>
+                        `;
+
+                const response = await fetch('/Comment/GetComments?t=' + new Date().getTime(), {
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // HTTP hata durumlarını yakala
+                if (!response.ok) {
+                    throw new Error(`Yorumlar alınamadı (HTTP ${response.status})`);
+                }
+
+                const comments = await response.json();
+
+                // Yorum yoksa bilgi mesajı göster
+                if (!comments || comments.length === 0) {
+                    commentsContainer.innerHTML = `
+                                <div style="
+                                    color: #777;
+                                    text-align: center;
+                                    padding: 20px;
+                                    font-style: italic;
+                                ">
+                                    Henüz yorum yapılmamış. İlk yorumu siz yapın!
+                                </div>
+                            `;
+                    return;
+                }
+
+                // Container'ı temizle
+                commentsContainer.innerHTML = '';
+
+                // Yorumları ters sırada göster (en yeni üstte)
+                comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment-item';
+                    commentDiv.style.cssText = `
+                    padding: 8px;  // 12px yerine 8px yapın
+                    background: rgba(255,255,255,0.95);
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    border-left: 3px solid #3498db;
+                    margin-bottom: 8px;  // 10px yerine 8px yapın
+                    transition: all 0.3s ease;
+                `;
+
+                    // Mouse hover efekti
+                    commentDiv.onmouseenter = () => {
+                        commentDiv.style.transform = 'translateX(5px)';
+                        commentDiv.style.boxShadow = '0 3px 6px rgba(0,0,0,0.15)';
+                    };
+                    commentDiv.onmouseleave = () => {
+                        commentDiv.style.transform = 'translateX(0)';
+                        commentDiv.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                    };
+
+                    // Yorumcu adı
+                    const name = document.createElement('div');
+                    name.className = 'comment-name';
+                    name.textContent = comment.name || 'Anonim';
+                    name.style.cssText = `
+                    font-weight: bold;
+                    margin-bottom: 4px;
+                    font-size: 12px;  // 14px yerine 12px yapın
+                    color: #2c3e50;
+                `;
+
+                    // Yorum metni
+                    const text = document.createElement('div');
+                    text.className = 'comment-text';
+                    text.textContent = comment.text;
+                    text.style.cssText = `
+                    color: #333;
+                    line-height: 1.4;
+                    margin-bottom: 6px;
+                    word-break: break-word;
+                    white-space: pre-line;
+                    font-size: 11px;  // Yeni eklenen satır
+                `;
+
+                    // Yorum tarihi
+                    const date = document.createElement('div');
+                    date.className = 'comment-date';
+                    date.textContent = new Date(comment.createdAt).toLocaleString('tr-TR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    date.style.cssText = `
+                    font-size: 10px;  // 11px yerine 10px yapın
+                    color: #7f8c8d;
+                    text-align: right;
+                    font-style: italic;
+                `;
+
+                    commentDiv.appendChild(name);
+                    commentDiv.appendChild(text);
+                    commentDiv.appendChild(date);
+                    commentsContainer.appendChild(commentDiv);
+                });
+
+                // Scroll ayarları
+                commentsContainer.style.cssText = `
+                            scrollbar-width: thin;
+                            scrollbar-color: #ddd transparent;
+                            overflow-y: auto;
+                            max-height: calc(100% - 40px);
+                            padding-right: 5px;
+                        `;
+
+            } catch (error) {
+                console.error('Yorumlar yüklenirken hata:', error);
+
+                // Detaylı hata mesajı
+                commentsContainer.innerHTML = '';
+
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                            color: #e74c3c;
+                            text-align: center;
+                            padding: 20px;
+                            border: 1px dashed #e74c3c;
+                            border-radius: 4px;
+                            background-color: rgba(231, 76, 60, 0.05);
+                            margin: 10px;
+                        `;
+
+                errorDiv.innerHTML = `
+                            <div style="
+                                font-weight: bold;
+                                margin-bottom: 8px;
+                                color: #c0392b;
+                            ">
+                                <i class="fas fa-exclamation-circle"></i> Yorumlar yüklenirken hata oluştu
+                            </div>
+                            <div style="
+                                font-size: 12px;
+                                color: #95a5a6;
+                                margin-bottom: 10px;
+                            ">
+                                ${error.message}
+                            </div>
+                            <button onclick="loadComments()" style="
+                                margin-top: 10px;
+                                padding: 6px 12px;
+                                background: #f8f8f8;
+                                border: 1px solid #ddd;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                transition: all 0.3s;
+                            ">
+                                <i class="fas fa-sync-alt"></i> Tekrar Dene
+                            </button>
+                        `;
+
+                commentsContainer.appendChild(errorDiv);
+            }
+        };
         document.addEventListener('DOMContentLoaded', function () {
+
+
             // ===== Three.js Model Arkaplan =====
             const container = document.getElementById('modelContainer');
             const loadingOverlay = document.getElementById('loadingOverlay');
@@ -188,7 +441,7 @@
             const scene3d = new THREE.Scene();
             scene3d.background = new THREE.Color(0x222222);
 
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight , 0.1, 1000);
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 2.5;
 
             const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -203,49 +456,39 @@
 
             const loader = new THREE.GLTFLoader();
             function frameObject(camera, object, offset = 1.2) {
-              const box = new THREE.Box3().setFromObject(object);
-              const size = box.getSize(new THREE.Vector3());
-              const center = box.getCenter(new THREE.Vector3());
-              const maxSize = Math.max(size.x, size.y, size.z);
-              const fitHeightDistance = maxSize / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
-              const fitWidthDistance = fitHeightDistance / camera.aspect;
-              const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
+                const box = new THREE.Box3().setFromObject(object);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+                const maxSize = Math.max(size.x, size.y, size.z);
+                const fitHeightDistance = maxSize / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)));
+                const fitWidthDistance = fitHeightDistance / camera.aspect;
+                const distance = offset * Math.max(fitHeightDistance, fitWidthDistance);
 
-              const yDown = 0 * maxSize;            // 0.10–0.30 arası deneyebilirsiniz
-              camera.position.set(center.x, center.y - yDown, center.z + distance);
+                const yDown = 0 * maxSize;
+                camera.position.set(center.x, center.y - yDown, center.z + distance);
 
-              camera.near = distance / 100;
-              camera.far = distance * 100;
-              camera.updateProjectionMatrix();
-              camera.lookAt(center);
-
-              //camera.position.y += 0.15; // 0.05–0.2 arasında deneyin
-              //controls.update();
+                camera.near = distance / 100;
+                camera.far = distance * 100;
+                camera.updateProjectionMatrix();
+                camera.lookAt(center);
             }
-    
-           
 
             loader.load(
                 '/models/guts.glb',
                 function (gltf) {
-                  const model = gltf.scene;
+                    const model = gltf.scene;
+                    model.scale.set(0.63, 0.63, 0.63);
+                    model.position.y = -0.8;
+                    scene3d.add(model);
+                    frameObject(camera, model);
 
-                  // 1) Nihai transformlar önce
-                  model.scale.set(0.63, 0.63, 0.63);
-                  model.position.y = -0.8;
-                  scene3d.add(model);
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    controls.target.copy(center);
+                    controls.update();
 
-                  // 2) İlk kadrajı istediğin uzaklıkta yap (2–3 scroll eşleniği için 1.35 civarı)
-                  frameObject(camera, model, );
-
-                  // 3) OrbitControls hedefini modele sabitle
-                  const box = new THREE.Box3().setFromObject(model);
-                  const center = box.getCenter(new THREE.Vector3());
-                  controls.target.copy(center);
-                  controls.update();
-
-                  loadingOverlay.style.opacity = '0';
-                  setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => { loadingOverlay.style.display = 'none'; }, 500);
                 },
                 function (xhr) {
                     if (xhr.total) progressBar.value = (xhr.loaded / xhr.total) * 100;
@@ -253,16 +496,17 @@
                 function (error) {
                     console.error('Model yükleme hatası:', error);
                     loadingOverlay.innerHTML = `<div style="text-align:center;padding:20px;">
-                            <h2>Model Yüklenemedi!</h2>
-                            <p>${error.message || 'Bilinmeyen hata'}</p>
-                            <button onclick="window.location.reload()" style="padding:10px 20px;background:#fff;color:#000;border:none;cursor:pointer;">Yeniden Dene</button>
-                        </div>`;
+                                    <h2>Model Yüklenemedi!</h2>
+                                    <p>${error.message || 'Bilinmeyen hata'}</p>
+                                    <button onclick="window.location.reload()" style="padding:10px 20px;background:#fff;color:#000;border:none;cursor:pointer;">Yeniden Dene</button>
+                                </div>`;
                 }
             );
 
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
+            controls.enableZoom = false;
 
             function animate() {
                 requestAnimationFrame(animate);
@@ -275,19 +519,29 @@
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
-                // Hex sahnesini de yeniden konumlandır
                 updatePanelPositions(currentAngle);
+                updateLowerPanelPositions(currentLowerAngle);
             });
 
-            // ===== 6'lı Hex Carousel (dikdörtgen) =====
-            const hexScene = document.getElementById('hexScene');
+            // ===== Hex Carousel =====
+            const hexSceneUpper = document.getElementById('hexSceneUpper');
+            const hexSceneLower = document.getElementById('hexSceneLower');
             const leftArrow = document.getElementById('leftArrow');
             const rightArrow = document.getElementById('rightArrow');
+            const upArrow = document.getElementById('upArrow');
+            const downArrow = document.getElementById('downArrow');
 
+            // Üst grup panelleri
             const panels = [1, 2, 3, 4, 5, 6];
             const panelElements = [];
-            const panelRotations = new Array(panels.length).fill(null); // mevcut rotateY takip
+            const panelRotations = new Array(panels.length).fill(null);
 
+            // Alt grup panelleri
+            const lowerPanels = [7, 8, 9, 10, 11, 12];
+            const lowerPanelElements = [];
+            const lowerPanelRotations = new Array(lowerPanels.length).fill(null);
+
+            // Üst grup panellerini oluştur
             panels.forEach(id => {
                 const el = document.createElement('div');
                 el.className = 'hex-panel';
@@ -309,7 +563,7 @@
                     title.style.paddingBottom = '8px';
 
                     const p = document.createElement('p');
-                    p.textContent = 'Merhaba, ben [Adınız]. Full-stack geliştirme ve 3D web deneyimleri üzerine çalışıyorum. Bu sitede projelerimi, deneyimlerimi ve notlarımı paylaşıyorum.';
+                    p.textContent = 'Merhaba, bwn N1celerI6mdAĞLAdı41. Uzun zamandır shifting ile berserk evrenine ışınlanmak için çabalar sarf ediyorum. En büyük motivasyonum gutsın karısını bi posta da benim sikmem. Bu sitede de shiftingin incelikleri ve atomik, atom altı düzeyde başka evrenlere ışınlanmanın biyolojik ve fiziksel sonuçları üzerine çalıştığım araştırma ve projelerimi paylaşmayı düşünüyorum.';
                     p.style.margin = '10px 0 0 0';
                     p.style.lineHeight = '1.5';
 
@@ -321,16 +575,249 @@
                 }
                 el.appendChild(inner);
                 el.dataset.id = String(id);
-                hexScene.appendChild(el);
+                hexSceneUpper.appendChild(el);
                 panelElements.push(el);
             });
 
+            // Alt grup panellerini oluştur
+            lowerPanels.forEach(id => {
+                const el = document.createElement('div');
+                el.className = 'hex-panel';
+                const inner = document.createElement('div');
+                inner.className = 'hex-panel-inner';
+      
+
+                if (id === 7) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.padding = '20px';
+                    wrapper.style.width = '100%';
+                    wrapper.style.height = '100%';
+                    wrapper.style.display = 'flex';
+                    wrapper.style.flexDirection = 'column';
+                    wrapper.style.boxSizing = 'border-box';
+
+                    const title = document.createElement('h3');
+                    title.textContent = 'Yorum Yap';
+                    title.style.margin = '0 0 15px 0';
+                    title.style.fontSize = '18px';
+                    title.style.borderBottom = '1px solid #e5e5e5';
+                    title.style.paddingBottom = '6px';
+
+                    const form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = '/Comment/Add';
+                    form.style.display = 'flex';
+                    form.style.flexDirection = 'column';
+                    form.style.gap = '12px';
+                    form.style.flex = '1';
+
+                    // Anti-forgery token ekle
+                    const token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                    form.appendChild(token);
+
+                    const nameLabel = document.createElement('label');
+                    nameLabel.textContent = 'İsim (opsiyonel)';
+                    nameLabel.style.fontSize = '13px';
+                    nameLabel.style.color = '#555';
+
+                    const nameInput = document.createElement('input');
+                    nameInput.type = 'text';
+                    nameInput.name = 'Name';
+                    nameInput.maxLength = 100;
+                    nameInput.style.padding = '8px';
+                    nameInput.style.border = '1px solid #ddd';
+                    nameInput.style.borderRadius = '4px';
+                    nameInput.style.fontSize = '14px';
+
+                    const commentLabel = document.createElement('label');
+                    commentLabel.textContent = 'Yorumunuz*';
+                    commentLabel.style.fontSize = '13px';
+                    commentLabel.style.color = '#555';
+
+                    const commentInput = document.createElement('textarea');
+                    commentInput.name = 'Text';
+                    commentInput.required = true;
+                    commentInput.maxLength = 500;
+                    commentInput.style.padding = '8px';
+                    commentInput.style.border = '1px solid #ddd';
+                    commentInput.style.borderRadius = '4px';
+                    commentInput.style.height = '150px';
+                    commentInput.style.resize = 'none';
+                    commentInput.style.fontSize = '14px';
+                    commentInput.style.flex = '1';
+
+                    const submitBtn = document.createElement('button');
+                    submitBtn.type = 'submit';
+                    submitBtn.textContent = 'Gönder';
+                    submitBtn.style.padding = '10px';
+                    submitBtn.style.background = '#333';
+                    submitBtn.style.color = 'white';
+                    submitBtn.style.border = 'none';
+                    submitBtn.style.borderRadius = '4px';
+                    submitBtn.style.cursor = 'pointer';
+                    submitBtn.style.transition = 'background 0.3s';
+                    submitBtn.style.fontSize = '14px';
+                    submitBtn.onmouseenter = () => submitBtn.style.background = '#555';
+                    submitBtn.onmouseleave = () => submitBtn.style.background = '#333';
+
+                    form.appendChild(nameLabel);
+                    form.appendChild(nameInput);
+                    form.appendChild(commentLabel);
+                    form.appendChild(commentInput);
+                    form.appendChild(submitBtn);
+
+                    wrapper.appendChild(title);
+                    wrapper.appendChild(form);
+                    inner.appendChild(wrapper);
+
+                    // Form gönderildikten sonra yorumları yenile
+                    // Eski form.onsubmit kısmını sil ve yerine bu kodu ekle:
+                    form.onsubmit = async function (e) {
+                        e.preventDefault();
+                        try {
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            submitBtn.disabled = true;
+                            submitBtn.textContent = 'Gönderiliyor...';
+
+                            const formData = new FormData(form);
+                            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                            const response = await fetch(form.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'RequestVerificationToken': token
+                                }
+                            });
+
+                            const result = await response.json();
+
+                            if (result.success) {
+                                form.reset();
+                                await loadComments();
+
+                                // Başarı mesajı (isteğe bağlı)
+                                //const successMsg = document.createElement('div');
+                                //successMsg.textContent = 'Yorumunuz başarıyla eklendi!';
+                                //successMsg.style.color = 'green';
+                                //successMsg.style.marginTop = '10px';
+                                //successMsg.style.textAlign = 'center';
+                                //form.appendChild(successMsg);
+
+                                // 3 saniye sonra mesajı kaldır
+                                //setTimeout(() => {
+                                //form.removeChild(successMsg);
+                                //}, 3000);
+                            } else {
+                                alert('Hata: ' + (result.errors?.join(', ') || 'Bilinmeyen hata'));
+                            }
+                        } catch (error) {
+                            console.error('Yorum gönderilirken hata:', error);
+                            alert('Bir hata oluştu: ' + error.message);
+                        } finally {
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Gönder';
+                        }
+                    };
+                }
+
+
+
+
+                else if (id === 8) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.padding = '15px';
+                    wrapper.style.width = '100%';
+                    wrapper.style.height = '100%';
+                    wrapper.style.overflowY = 'auto';
+                    wrapper.style.boxSizing = 'border-box';
+
+                    const title = document.createElement('h3');
+                    title.textContent = 'Son Yorumlar';
+                    title.style.margin = '0 0 15px 0';
+                    title.style.fontSize = '18px';
+                    title.style.borderBottom = '1px solid #e5e5e5';
+                    title.style.paddingBottom = '6px';
+                    title.style.position = 'sticky';
+                    title.style.top = '0';
+                    title.style.background = 'rgba(255,255,255,0.95)';
+                    title.style.zIndex = '1';
+
+                    const commentsContainer = document.createElement('div');
+                    commentsContainer.id = 'commentsContainer';
+                    commentsContainer.style.display = 'flex';
+                    commentsContainer.style.flexDirection = 'column';
+                    commentsContainer.style.gap = '10px';
+                    commentsContainer.style.fontSize = '13px'; // Yazı boyutunu küçülttük
+
+
+                    wrapper.appendChild(title);
+                    wrapper.appendChild(commentsContainer);
+                    inner.appendChild(wrapper);
+
+                    // Sayfa yüklendiğinde yorumları yükle
+                    loadComments();
+
+                    // Her 30 saniyede bir yorumları yenile
+                    setInterval(loadComments, 30000);
+                }
+                
+                
+                else {
+                    inner.textContent = String(id);
+                }
+                el.appendChild(inner);
+                el.dataset.id = String(id);
+                hexSceneLower.appendChild(el);
+                lowerPanelElements.push(el);
+            });
+
             let currentAngle = 0;
-            const angleStep = 60; // 360/6
+            let currentLowerAngle = 0;
+            const angleStep = 60;
+
+            // Scroll pozisyonu takibi
+            let currentScrollPosition = 0; // 0: üst grup, 1: alt grup
+            let isAnimating = false;
 
             function rotate(angle) {
-                currentAngle += angle;
-                updatePanelPositions(currentAngle);
+                if (currentScrollPosition === 0) {
+                    currentAngle += angle;
+                    updatePanelPositions(currentAngle);
+                } else {
+                    currentLowerAngle += angle;
+                    updateLowerPanelPositions(currentLowerAngle);
+                }
+            }
+
+            function scrollTo(positionIndex) {
+                if (isAnimating || positionIndex < 0 || positionIndex > 1) return;
+
+                isAnimating = true;
+                currentScrollPosition = positionIndex;
+
+                if (positionIndex === 0) {
+                    // Yukarı scroll - üst grubu geri getir
+                    hexSceneUpper.style.transform = 'translateY(0)';
+                    hexSceneLower.style.transform = 'translateY(100%)';
+                } else {
+                    // Aşağı scroll - üst grubu yukarı çıkar, alt grubu getir
+                    hexSceneUpper.style.transform = 'translateY(-100%)';
+                    hexSceneLower.style.transform = 'translateY(0)';
+                }
+
+                // Okları güncelle
+                upArrow.style.display = positionIndex === 0 ? 'none' : 'flex';
+                downArrow.style.display = positionIndex === 1 ? 'none' : 'flex';
+
+                // Animasyon bitince kilidi kaldır
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 800); // CSS'deki transition süresiyle aynı olmalı
             }
 
             function normalizeAngleDeg(deg) {
@@ -340,14 +827,12 @@
 
             function updatePanelPositions(angle) {
                 const radius = 600;
-                const sceneHeight = hexScene.clientHeight;
-
-                const samplePanel = panelElements[0];
-                const panelHalfHeight = samplePanel ? samplePanel.offsetHeight / 2 : 200;
+                const sceneHeight = hexSceneUpper.clientHeight;
+                const panelHalfHeight = 200;
                 const baseBottomMargin = 20;
-                const uplift = 260; // tüm grubu biraz daha yukarı taşı
+                const uplift = 260;
                 const yFrontBase = (sceneHeight / 2) - panelHalfHeight - baseBottomMargin - uplift;
-                const stepY = 120; // her katman yukarı
+                const stepY = 120;
 
                 panelElements.forEach((panel, index) => {
                     const rawAngle = angle + index * 60;
@@ -358,14 +843,12 @@
                     const z = Math.cos(rad) * radius;
 
                     const absA = Math.abs(panelAngleNorm);
-                    let layer; // 0: ön, 1: ±60, 2: ±120, 3: 180
-                    if (absA < 30) layer = 0; else if (absA < 90) layer = 1; else if (absA < 150) layer = 2; else layer = 3;
+                    let layer = (absA < 30) ? 0 : (absA < 90) ? 1 : (absA < 150) ? 2 : 3;
 
-                    const opacity = (layer === 3) ? 0 : Math.max(0, 1 - 0.2 * layer); // 1.0, 0.8, 0.6, 0.0
-                    const scale = 1 - 0.1 * layer; // 1.0, 0.9, 0.8, 0.7
+                    const opacity = (layer === 3) ? 0 : Math.max(0, 1 - 0.2 * layer);
+                    const scale = 1 - 0.1 * layer;
                     const y = yFrontBase - (stepY * layer);
 
-                    // Dönüşü en kısa yoldan yap: önceki değere en yakın eşdeğer hedefi seç
                     const prev = panelRotations[index];
                     let target = panelAngleNorm;
                     if (prev !== null) {
@@ -379,21 +862,91 @@
 
                     const inner = panel.querySelector('.hex-panel-inner');
                     if (inner) inner.style.transform = (layer === 3) ? 'rotateY(180deg)' : 'rotateY(0deg)';
-
                     panel.style.zIndex = String(Math.round(1000 + z));
                 });
             }
 
-            // ilk yerleşim
-            updatePanelPositions(0);
+            function updateLowerPanelPositions(angle) {
+                const radius = 600;
+                const sceneHeight = hexSceneLower.clientHeight;
+                const panelHalfHeight = 200;
+                const baseBottomMargin = 20;
+                const uplift = 260;
+                const yFrontBase = (sceneHeight / 2) - panelHalfHeight - baseBottomMargin - uplift;
+                const stepY = 120;
 
-            // Oklara tıklama ve klavye
+                lowerPanelElements.forEach((panel, index) => {
+                    const rawAngle = angle + index * 60;
+                    const panelAngleNorm = normalizeAngleDeg(rawAngle);
+                    const rad = (rawAngle % 360) * Math.PI / 180;
+
+                    const x = Math.sin(rad) * radius;
+                    const z = Math.cos(rad) * radius;
+
+                    const absA = Math.abs(panelAngleNorm);
+                    let layer = (absA < 30) ? 0 : (absA < 90) ? 1 : (absA < 150) ? 2 : 3;
+
+                    const opacity = (layer === 3) ? 0 : Math.max(0, 1 - 0.2 * layer);
+                    const scale = 1 - 0.1 * layer;
+                    const y = yFrontBase - (stepY * layer);
+
+                    const prev = lowerPanelRotations[index];
+                    let target = panelAngleNorm;
+                    if (prev !== null) {
+                        while (target - prev > 180) target -= 360;
+                        while (target - prev < -180) target += 360;
+                    }
+                    lowerPanelRotations[index] = target;
+
+                    panel.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${target}deg) scale(${scale})`;
+                    panel.style.opacity = opacity;
+
+                    const inner = panel.querySelector('.hex-panel-inner');
+                    if (inner) inner.style.transform = (layer === 3) ? 'rotateY(180deg)' : 'rotateY(0deg)';
+                    panel.style.zIndex = String(Math.round(1000 + z));
+                });
+            }
+
+            // İlk yerleşim
+            updatePanelPositions(0);
+            updateLowerPanelPositions(0);
+            scrollTo(0); // Başlangıçta üst grup gösterilsin
+            upArrow.style.display = 'none'; // Başlangıçta yukarı ok gizli
+
+            // Oklara tıklama
             leftArrow.addEventListener('click', () => rotate(angleStep));
             rightArrow.addEventListener('click', () => rotate(-angleStep));
+            upArrow.addEventListener('click', () => scrollTo(0));
+            downArrow.addEventListener('click', () => scrollTo(1));
+
+            // Klavye kontrolleri
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'ArrowLeft') rotate(angleStep);
                 if (e.key === 'ArrowRight') rotate(-angleStep);
+                if (e.key === 'ArrowUp') scrollTo(0);
+                if (e.key === 'ArrowDown') scrollTo(1);
             });
+
+            // Fare tekerleği ile scroll
+            document.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (e.deltaY > 0 && currentScrollPosition === 0) {
+                    scrollTo(1);
+                } else if (e.deltaY < 0 && currentScrollPosition === 1) {
+                    scrollTo(0);
+                }
+            }, { passive: false });
+
+            // Sayfa yüklendiğinde kontrol et ve yorum panelini aç
+            if (@Json.Serialize(showComments)) {
+                scrollTo(1); // Alt gruba geçiş yap
+                currentLowerAngle = 0; // Yorum panelini (7. panel) merkeze al
+                updateLowerPanelPositions(currentLowerAngle);
+            }
+            if (document.getElementById('commentsContainer')) {
+                loadComments();
+            }
+
         });
     </script>
 </body>
