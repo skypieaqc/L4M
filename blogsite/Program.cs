@@ -3,11 +3,23 @@ using Microsoft.AspNetCore.StaticFiles; // Bu satýrý ekleyin
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using blogsite.Data; // kendi namespace'ine göre
+using blogsite.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false; // Þifre kurallarýný özelleþtirin
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
@@ -47,6 +59,10 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

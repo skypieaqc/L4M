@@ -1,7 +1,6 @@
 using blogsite.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using blogsite.Data;
 using blogsite.Models;
 
 namespace YourProjectName.Controllers
