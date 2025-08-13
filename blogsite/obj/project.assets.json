@@ -61,11 +61,11 @@
           }
         }
       },
-      "Microsoft.AspNetCore.Identity.UI/8.0.19": {
+      "Microsoft.AspNetCore.Identity.UI/8.0.6": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.19",
-          "Microsoft.Extensions.Identity.Stores": "8.0.19"
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.6",
+          "Microsoft.Extensions.Identity.Stores": "8.0.6"
         },
         "compile": {
           "lib/net8.0/Microsoft.AspNetCore.Identity.UI.dll": {
@@ -722,7 +722,7 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "Microsoft.Extensions.FileProviders.Embedded/8.0.19": {
+      "Microsoft.Extensions.FileProviders.Embedded/8.0.6": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.FileProviders.Abstractions": "8.0.0"
@@ -1357,10 +1357,10 @@
         "microsoft.aspnetcore.identity.entityframeworkcore.nuspec"
       ]
     },
-    "Microsoft.AspNetCore.Identity.UI/8.0.19": {
-      "sha512": "NFrFJpIZ2zO9I3UkuGxCDLWufc8e/uRdztPyvt2r6HGv5lWC62jBkOJW+Uy0jVlvWHiVBNVIEBXsEjAGuVDPWw==",
+    "Microsoft.AspNetCore.Identity.UI/8.0.6": {
+      "sha512": "+8tMwa8kBm0HrU3ygFZYFD0W2VpwpJRB8rbyC7iLPdxDsnOPsAxcvjkP/J/P4Q+DJWXmbR/pc7kLGiaNs/3zLw==",
       "type": "package",
-      "path": "microsoft.aspnetcore.identity.ui/8.0.19",
+      "path": "microsoft.aspnetcore.identity.ui/8.0.6",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1375,7 +1375,7 @@
         "buildTransitive/Microsoft.AspNetCore.Identity.UI.targets",
         "lib/net8.0/Microsoft.AspNetCore.Identity.UI.dll",
         "lib/net8.0/Microsoft.AspNetCore.Identity.UI.xml",
-        "microsoft.aspnetcore.identity.ui.8.0.19.nupkg.sha512",
+        "microsoft.aspnetcore.identity.ui.8.0.6.nupkg.sha512",
         "microsoft.aspnetcore.identity.ui.nuspec",
         "staticwebassets/V4/css/site.css",
         "staticwebassets/V4/favicon.ico",
@@ -2806,10 +2806,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.FileProviders.Embedded/8.0.19": {
-      "sha512": "9Ij++5nngMd8aE+AZv7jvtqWLta+M6m7V6SHIEmnUpiHUhQFBTMaxQkYuGa9L3ACFFDnUQi8tvVKcA3RnCSi8w==",
+    "Microsoft.Extensions.FileProviders.Embedded/8.0.6": {
+      "sha512": "hQlf5+YxiUbKdpaPBf/zdMGItnWF8ai9ToPjeZ6gnxT10V4RGDKvChl5MSdc838+2SRHLAC0cdJwG0+L7dqR0g==",
       "type": "package",
-      "path": "microsoft.extensions.fileproviders.embedded/8.0.19",
+      "path": "microsoft.extensions.fileproviders.embedded/8.0.6",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2824,7 +2824,7 @@
         "lib/net8.0/Microsoft.Extensions.FileProviders.Embedded.xml",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Embedded.dll",
         "lib/netstandard2.0/Microsoft.Extensions.FileProviders.Embedded.xml",
-        "microsoft.extensions.fileproviders.embedded.8.0.19.nupkg.sha512",
+        "microsoft.extensions.fileproviders.embedded.8.0.6.nupkg.sha512",
         "microsoft.extensions.fileproviders.embedded.nuspec",
         "tasks/netstandard2.0/Microsoft.Extensions.FileProviders.Embedded.Manifest.Task.dll"
       ]
@@ -3623,30 +3623,30 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.19",
-      "Microsoft.AspNetCore.Identity.UI >= 8.0.19",
+      "Microsoft.AspNetCore.Identity.UI >= 8.0.6",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.8",
       "Microsoft.EntityFrameworkCore.Sqlite >= 9.0.7",
       "Microsoft.EntityFrameworkCore.Tools >= 9.0.7"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ahmet\\.nuget\\packages\\": {},
+    "C:\\Users\\guts\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\blogsite.csproj",
+      "projectUniqueName": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\blogsite.csproj",
       "projectName": "blogsite",
-      "projectPath": "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\blogsite.csproj",
-      "packagesPath": "C:\\Users\\ahmet\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ahmet\\OneDrive\\Masaüstü\\L4M\\blogsite\\obj\\",
+      "projectPath": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\blogsite.csproj",
+      "packagesPath": "C:\\Users\\guts\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\guts\\Desktop\\bs\\L4M\\blogsite\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\ahmet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\guts\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -3672,7 +3672,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
@@ -3684,7 +3685,7 @@
           },
           "Microsoft.AspNetCore.Identity.UI": {
             "target": "Package",
-            "version": "[8.0.19, )"
+            "version": "[8.0.6, )"
           },
           "Microsoft.EntityFrameworkCore.Design": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -3722,7 +3723,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -1,0 +1,39 @@
+﻿@model List<ApplicationUser>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> _userManager
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Kullanıcı Adı</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>
+                    @if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        <span class="badge bg-danger">Admin</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary">Kullanıcı</span>
+                    }
+                </td>
+                <td>
+                    <form asp-action="AssignAdminRole" method="post">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <button type="submit" class="btn btn-sm btn-warning">Admin Yap</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

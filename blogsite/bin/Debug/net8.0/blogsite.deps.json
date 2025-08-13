@@ -9,7 +9,7 @@
       "blogsite/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.19",
-          "Microsoft.AspNetCore.Identity.UI": "8.0.19",
+          "Microsoft.AspNetCore.Identity.UI": "8.0.6",
           "Microsoft.EntityFrameworkCore.Design": "9.0.8",
           "Microsoft.EntityFrameworkCore.Sqlite": "9.0.7",
           "Microsoft.EntityFrameworkCore.Tools": "9.0.7"
@@ -57,15 +57,15 @@
           }
         }
       },
-      "Microsoft.AspNetCore.Identity.UI/8.0.19": {
+      "Microsoft.AspNetCore.Identity.UI/8.0.6": {
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Embedded": "8.0.19",
+          "Microsoft.Extensions.FileProviders.Embedded": "8.0.6",
           "Microsoft.Extensions.Identity.Stores": "8.0.19"
         },
         "runtime": {
           "lib/net8.0/Microsoft.AspNetCore.Identity.UI.dll": {
-            "assemblyVersion": "8.0.19.0",
-            "fileVersion": "8.0.1925.37204"
+            "assemblyVersion": "8.0.6.0",
+            "fileVersion": "8.0.624.26909"
           }
         }
       },
@@ -544,14 +544,14 @@
           "Microsoft.Extensions.Primitives": "9.0.8"
         }
       },
-      "Microsoft.Extensions.FileProviders.Embedded/8.0.19": {
+      "Microsoft.Extensions.FileProviders.Embedded/8.0.6": {
         "dependencies": {
           "Microsoft.Extensions.FileProviders.Abstractions": "8.0.0"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.FileProviders.Embedded.dll": {
             "assemblyVersion": "8.0.0.0",
-            "fileVersion": "8.0.1925.37204"
+            "fileVersion": "8.0.624.26909"
           }
         }
       },
@@ -937,12 +937,12 @@
       "path": "microsoft.aspnetcore.identity.entityframeworkcore/8.0.19",
       "hashPath": "microsoft.aspnetcore.identity.entityframeworkcore.8.0.19.nupkg.sha512"
     },
-    "Microsoft.AspNetCore.Identity.UI/8.0.19": {
+    "Microsoft.AspNetCore.Identity.UI/8.0.6": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NFrFJpIZ2zO9I3UkuGxCDLWufc8e/uRdztPyvt2r6HGv5lWC62jBkOJW+Uy0jVlvWHiVBNVIEBXsEjAGuVDPWw==",
-      "path": "microsoft.aspnetcore.identity.ui/8.0.19",
-      "hashPath": "microsoft.aspnetcore.identity.ui.8.0.19.nupkg.sha512"
+      "sha512": "sha512-+8tMwa8kBm0HrU3ygFZYFD0W2VpwpJRB8rbyC7iLPdxDsnOPsAxcvjkP/J/P4Q+DJWXmbR/pc7kLGiaNs/3zLw==",
+      "path": "microsoft.aspnetcore.identity.ui/8.0.6",
+      "hashPath": "microsoft.aspnetcore.identity.ui.8.0.6.nupkg.sha512"
     },
     "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
       "type": "package",
@@ -1119,12 +1119,12 @@
       "path": "microsoft.extensions.fileproviders.abstractions/8.0.0",
       "hashPath": "microsoft.extensions.fileproviders.abstractions.8.0.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.FileProviders.Embedded/8.0.19": {
+    "Microsoft.Extensions.FileProviders.Embedded/8.0.6": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-9Ij++5nngMd8aE+AZv7jvtqWLta+M6m7V6SHIEmnUpiHUhQFBTMaxQkYuGa9L3ACFFDnUQi8tvVKcA3RnCSi8w==",
-      "path": "microsoft.extensions.fileproviders.embedded/8.0.19",
-      "hashPath": "microsoft.extensions.fileproviders.embedded.8.0.19.nupkg.sha512"
+      "sha512": "sha512-hQlf5+YxiUbKdpaPBf/zdMGItnWF8ai9ToPjeZ6gnxT10V4RGDKvChl5MSdc838+2SRHLAC0cdJwG0+L7dqR0g==",
+      "path": "microsoft.extensions.fileproviders.embedded/8.0.6",
+      "hashPath": "microsoft.extensions.fileproviders.embedded.8.0.6.nupkg.sha512"
     },
     "Microsoft.Extensions.Identity.Core/8.0.19": {
       "type": "package",
