@@ -1,0 +1,505 @@
+:root {
+    --content-bg: rgba(20, 20, 25, 0.95); /* Daha koyu arkaplan */
+    --border-color: rgba(80, 80, 90, 0.6); /* Koyu tema border */
+    --shadow-color: rgba(0, 0, 0, 0.7); /* Daha derin gölge */
+    --transition-duration: 0.8s;
+    --accent-color: #4a90e2; /* Vurgu rengi */
+    --text-color: #e8e8e8; /* Ana yazý rengi */
+    --secondary-text: #b0b0b0; /* Ýkincil yazý rengi */
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    background: #1a1a1f;
+}
+
+/* 3D Model arka plan container */
+#modelContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+/* Yükleme Ekraný */
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 2000;
+    transition: opacity 0.5s;
+}
+
+/* Hex carousel sahnesi (üst katman) */
+.hex-scene {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    perspective: 2000px;
+    z-index: 100;
+    pointer-events: none;
+    transition: transform var(--transition-duration) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#hexSceneUpper {
+    transform: translateY(0);
+}
+
+#hexSceneLower {
+    transform: translateY(100%);
+}
+
+/* 6'lý dönen çerçeveler (dikdörtgen) - ALT KONUMA TAÞINDI */
+.hex-panel {
+    position: absolute;
+    width: 420px; /* Biraz daha geniþ */
+    height: 280px; /* Biraz daha yüksek */
+    background: linear-gradient(145deg, rgba(25, 25, 32, 0.95), rgba(15, 15, 20, 0.98)); /* Koyu gradient */
+    border-radius: 8px; /* Hafif yuvarlak köþeler */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1); /* Ýç gölge ve highlight */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4.5rem;
+    font-weight: 300; /* Daha ince font */
+    color: var(--text-color);
+    transition: all var(--transition-duration) ease;
+    backface-visibility: visible;
+    transform-origin: center center;
+    left: 50%;
+    top: 50%;
+    margin-left: -210px; /* Panel geniþliðinin yarýsý */
+    margin-top: -50px; /* Panelleri daha alta taþýr (önceden -200px idi) */
+    border: 1px solid rgba(100, 100, 120, 0.3); /* Çok subtle border */
+    backdrop-filter: blur(10px); /* Cam efekti */
+    pointer-events: auto;
+}
+
+    /* Hover efekti */
+    .hex-panel:hover {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(74, 144, 226, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        border-color: rgba(74, 144, 226, 0.5);
+    }
+
+.hex-panel-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-style: preserve-3d;
+    transition: transform var(--transition-duration) ease;
+    color: var(--text-color);
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+/* Geçiþ Oklarý - Koyu tema güncellemesi */
+.nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.8rem;
+    color: var(--text-color);
+    cursor: pointer;
+    z-index: 1100;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    background: linear-gradient(145deg, rgba(30, 30, 40, 0.9), rgba(20, 20, 30, 0.9));
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    user-select: none;
+    pointer-events: auto;
+    border: 1px solid rgba(100, 100, 120, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+    .nav-arrow:hover {
+        background: linear-gradient(145deg, rgba(50, 50, 65, 0.95), rgba(30, 30, 45, 0.95));
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        border-color: var(--accent-color);
+    }
+
+#leftArrow {
+    left: 40px;
+}
+
+#rightArrow {
+    right: 40px;
+}
+
+/* Scroll oklarý - Koyu tema güncellemesi */
+.scroll-arrow {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.8rem;
+    color: var(--text-color);
+    cursor: pointer;
+    z-index: 1100;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    background: linear-gradient(145deg, rgba(30, 30, 40, 0.9), rgba(20, 20, 30, 0.9));
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    user-select: none;
+    pointer-events: auto;
+    opacity: 0.8;
+    border: 1px solid rgba(100, 100, 120, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+    .scroll-arrow:hover {
+        background: linear-gradient(145deg, rgba(50, 50, 65, 0.95), rgba(30, 30, 45, 0.95));
+        transform: translateX(-50%) scale(1.1);
+        opacity: 1;
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        border-color: var(--accent-color);
+    }
+
+#upArrow {
+    top: 30px;
+}
+
+#downArrow {
+    bottom: 30px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hex-panel {
+        width: 350px;
+        height: 240px;
+        margin-left: -175px;
+        margin-top: -20px; /* Mobilde daha da alta */
+        font-size: 3.2rem;
+    }
+
+    #leftArrow {
+        left: 20px;
+        width: 55px;
+        height: 55px;
+        font-size: 2.4rem;
+    }
+
+    #rightArrow {
+        right: 20px;
+        width: 55px;
+        height: 55px;
+        font-size: 2.4rem;
+    }
+
+    .scroll-arrow {
+        width: 55px;
+        height: 55px;
+        font-size: 2.4rem;
+    }
+
+    #userStatusBarTop, #userStatusBarBottom {
+        font-size: 12px;
+        padding: 6px 10px;
+        background: rgba(15, 15, 20, 0.9);
+    }
+}
+
+/* Yorum Bileþenleri Stilleri - Koyu tema güncellemesi */
+.loading-container {
+    color: var(--secondary-text);
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 4px solid rgba(100, 100, 120, 0.3);
+    border-top: 4px solid var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.no-comments-message {
+    color: var(--secondary-text);
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+.comment-item {
+    padding: 8px 10px;
+    background: linear-gradient(145deg, rgba(35, 35, 45, 0.9), rgba(25, 25, 35, 0.95)) !important;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    border-left: 3px solid var(--accent-color) !important;
+    margin-bottom: 6px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(100, 100, 120, 0.2);
+}
+
+    .comment-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        background: linear-gradient(145deg, rgba(40, 40, 50, 0.95), rgba(30, 30, 40, 0.95)) !important;
+    }
+
+.comment-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: var(--accent-color) !important;
+}
+
+.comment-text {
+    color: var(--text-color) !important;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    word-break: break-word;
+    white-space: pre-line;
+    font-size: 10px;
+}
+
+.comment-date {
+    font-size: 9px;
+    color: var(--secondary-text);
+    text-align: right;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.comments-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 100, 120, 0.5) transparent;
+    overflow-y: auto;
+    max-height: calc(100% - 40px);
+    padding-right: 8px;
+}
+
+.error-container {
+    color: #e74c3c;
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed rgba(231, 76, 60, 0.5);
+    border-radius: 6px;
+    background: linear-gradient(145deg, rgba(231, 76, 60, 0.1), rgba(200, 60, 50, 0.05));
+    margin: 10px;
+}
+
+.error-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #ff6b6b;
+}
+
+.error-message {
+    font-size: 12px;
+    color: var(--secondary-text);
+    margin-bottom: 12px;
+}
+
+.retry-button {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(145deg, rgba(50, 50, 65, 0.9), rgba(30, 30, 45, 0.9));
+    border: 1px solid rgba(100, 100, 120, 0.3);
+    border-radius: 4px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .retry-button:hover {
+        background: linear-gradient(145deg, rgba(70, 70, 85, 0.9), rgba(50, 50, 65, 0.9));
+        border-color: var(--accent-color);
+    }
+
+/* Form Bileþenleri Stilleri - Panel içine sýðacak þekilde optimize edildi */
+.comment-form-wrapper {
+    padding: 15px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden; /* Panelden taþmayý önle */
+}
+
+.comment-form-title {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(100, 100, 120, 0.3);
+    padding-bottom: 6px;
+    color: var(--text-color);
+    font-weight: 500;
+    flex-shrink: 0; /* Baþlýk küçülmesin */
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-height: 0; /* Flexbox içinde overflow çalýþmasý için */
+}
+
+.form-label {
+    font-size: 12px;
+    color: var(--secondary-text);
+    font-weight: 500;
+    margin-bottom: 2px;
+    flex-shrink: 0;
+}
+
+.form-input, .form-textarea {
+    padding: 8px 10px;
+    border: 1px solid rgba(100, 100, 120, 0.4);
+    border-radius: 4px;
+    font-size: 13px;
+    background: linear-gradient(145deg, rgba(40, 40, 50, 0.8), rgba(30, 30, 40, 0.9));
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.form-input {
+    height: 32px;
+    flex-shrink: 0;
+}
+
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+    }
+
+.form-textarea {
+    resize: none;
+    flex: 1; /* Kalan alaný kapla */
+    min-height: 80px; /* Minimum yükseklik */
+    font-family: inherit;
+}
+
+.form-submit-btn {
+    padding: 8px 16px;
+    background: linear-gradient(145deg, var(--accent-color), #3a7bc8);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+    flex-shrink: 0;
+    height: 36px;
+}
+
+    .form-submit-btn:hover {
+        background: linear-gradient(145deg, #5ba0f2, var(--accent-color));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    }
+
+    .form-submit-btn:disabled {
+        background: rgba(100, 100, 120, 0.5);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+/* Panel Ýçerik Stilleri - Panel boyutuna optimize edildi */
+.about-wrapper {
+    padding: 15px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: normal;
+    color: var(--text-color);
+    line-height: 1.5;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.about-title {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(100, 100, 120, 0.3);
+    padding-bottom: 6px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.about-text {
+    margin: 10px 0 0 0;
+    line-height: 1.5;
+    color: var(--text-color);
+    font-size: 12px;
+}
+
+.comments-list-wrapper {
+    padding: 15px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.comments-list-title {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(100, 100, 120, 0.3);
+    padding-bottom: 6px;
+    color: var(--text-color);
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+}
+
+.comments-display-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
